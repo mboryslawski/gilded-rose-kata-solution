@@ -1,16 +1,22 @@
 package com.gildedrose
 
+import com.gildedrose.SpecialItemIdentifier.*
+
 class ItemHandlersFactory {
 
-    private val itemHandlersMap = mapOf(
-        "Aged Brie" to AgedBrieHandler,
-        "Backstage passes to a TAFKAL80ETC concert" to BackstagePassesHandler,
-        "Sulfuras, Hand of Ragnaros" to SulfurasHandler,
-        "Conjured" to ConjuredItemHandler,
-    )
+    private val itemHandlers = SpecialItemIdentifier.entries.map {
+        when (it) {
+            AGED_BRIE -> ItemHandlerPair(it.itemName, AgedBrieHandler)
+            BACKSTAGE_PASSES -> ItemHandlerPair(it.itemName, BackstagePassesHandler)
+            SULFURAS -> ItemHandlerPair(it.itemName, SulfurasHandler)
+            CONJURED -> ItemHandlerPair(it.itemName, ConjuredItemHandler)
+        }
+    }
+
+    data class ItemHandlerPair(val itemName: String, val itemHandler: ItemHandler)
+
 
     context(Item)
     fun getItemHandler() =
-        itemHandlersMap.getOrDefault(name, NonSpecialItemHandler)
-
+        itemHandlers.firstOrNull { it.itemName == name }?.itemHandler ?: NonSpecialItemHandler
 }
